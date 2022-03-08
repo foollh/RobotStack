@@ -15,7 +15,6 @@ class Args():
         # self.robotPath = "kuka_iiwa/kuka_with_gripper.sdf"
         self.robotType = "URDF"  # SDF or URDF
         self.robotPath = "franka_panda/panda.urdf"
-        
         self.robotEndEffectorIndex = 6
         self.robotScale = 1
         self.robotInitAngle = [0.0, math.pi/4.-0.3, 0.0, -math.pi/2. + 0.3, 0.0, 3*math.pi/4., -math.pi/4., -math.pi/2., -math.pi/2., 1, 1, 0]
