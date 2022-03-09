@@ -7,11 +7,16 @@ class robotEnvironment():
     def __init__(self, args):
         if args.GUI:
             pb.connect(pb.GUI)
-    
+
+        # set camera
+        self.viewMatrix = pb.computeViewMatrix(args.cameraPos, args.cameraFocus, args.cameraVector)
+        self.projectMatrix = pb.computeProjectionMatrixFOV(args.cameraFov, args.cameraAspect, args.cameraNearVal, args.cameraFarVal)
+
     def basic_env(self, args):
         pb.setGravity(0, 0, args.gravity)
         pb.setAdditionalSearchPath(pd.getDataPath())
         
+        # load urdf models
         pb.loadURDF("plane.urdf", [0, 0, -0.3])
         pb.loadURDF(args.tablePath, basePosition=args.tablePosition)
         pb.loadURDF(args.trayPath, basePosition=args.trayPosition)

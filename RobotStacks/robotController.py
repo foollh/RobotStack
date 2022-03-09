@@ -14,6 +14,7 @@ class roboticMoving():
             sys.exit()
         self.numJoints = pb.getNumJoints(self.robotId)
         self.endEffectorIndex = args.robotEndEffectorIndex
+        self.gripper = args.robotGrippers
 
     def robotPosInit(self, angleList):
         for idx in range(self.numJoints):
@@ -53,10 +54,10 @@ class roboticMoving():
         return jointPoses
 
     def gripperPick(self):
-        pb.setJointMotorControl2(self.robotId, 9, pb.POSITION_CONTROL,force=500)
-        pb.setJointMotorControl2(self.robotId, 10, pb.POSITION_CONTROL,force=500)
+        pb.setJointMotorControl2(self.robotId, self.gripper[0], pb.POSITION_CONTROL,force=500)
+        pb.setJointMotorControl2(self.robotId, self.gripper[1], pb.POSITION_CONTROL,force=500)
     
     def gripperPush(self):
-        pb.setJointMotorControl2(self.robotId, 9, pb.POSITION_CONTROL,1)
-        pb.setJointMotorControl2(self.robotId, 10, pb.POSITION_CONTROL,1)
+        pb.setJointMotorControl2(self.robotId, self.gripper[0], pb.POSITION_CONTROL,1)
+        pb.setJointMotorControl2(self.robotId, self.gripper[1], pb.POSITION_CONTROL,1)
     
