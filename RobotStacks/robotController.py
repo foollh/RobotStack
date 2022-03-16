@@ -19,21 +19,40 @@ class roboticMoving():
     def robotPosInit(self, angleList):
         for idx in range(self.numJoints):
             pb.setJointMotorControl2(self.robotId, idx, pb.POSITION_CONTROL, angleList[idx])
+    
+    def drawDebugPoint(self, idx, debugLineLen, color):
+        posIndex = self.getpos(idx)
+        pre_pos1 = [posIndex[0][0]-debugLineLen, posIndex[0][1], posIndex[0][2]]
+        tar_pos1 = [posIndex[0][0]+debugLineLen, posIndex[0][1], posIndex[0][2]]
+        pre_pos2 = [posIndex[0][0], posIndex[0][1]-debugLineLen, posIndex[0][2]]
+        tar_pos2 = [posIndex[0][0], posIndex[0][1]+debugLineLen, posIndex[0][2]]
+        pre_pos3 = [posIndex[0][0], posIndex[0][1], posIndex[0][2]-debugLineLen]
+        tar_pos3 = [posIndex[0][0], posIndex[0][1], posIndex[0][2]+debugLineLen]
 
-    def getpos(self):
-        pass
+        pb.addUserDebugLine(pre_pos1, tar_pos1,lineColorRGB=color, lineWidth=300)
+        pb.addUserDebugLine(pre_pos2, tar_pos2,lineColorRGB=color, lineWidth=300)
+        pb.addUserDebugLine(pre_pos3, tar_pos3,lineColorRGB=color, lineWidth=300)
+        pb.addUserDebugText(str(idx), pre_pos1, textColorRGB=[1, 0, 0], textSize=2.)
+        print("link{0} position:\n{1}".format(idx, posIndex))
+    
+    def getpos(self, linkIndex):
+        linkInfo = pb.getLinkState(self.robotId, linkIndex)
+        linkToBasePos, linkToBaseOrn = linkInfo[0], linkInfo[1]
+        worldPosition, worldOrientation = linkInfo[4], linkInfo[5]
+        return worldPosition, worldOrientation
 
-    def setpos(self, position, orientation):
+    def setpos(self, jointIndex, position, orientation):
         pos = position
-        orn = pb.getQuaternionFromEuler(orientation)
+        orn = orientation
+        if len(orientation) == 3:
+            orn = pb.getQuaternionFromEuler(orientation)
         # jointPoses = self.accurateCalculateInverseKinematics(pos, orn, threshold=0.001, maxIter=100)
-        jointPoses = pb.calculateInverseKinematics(self.robotId, self.endEffectorIndex, pos, orn)
+        jointPoses = pb.calculateInverseKinematics(self.robotId, jointIndex, pos, orn)
         for j in range(self.numJoints-5):
             pb.setJointMotorControl2(bodyIndex=self.robotId,
                                 jointIndex=j,
                                 controlMode=pb.POSITION_CONTROL,
                                 targetPosition=jointPoses[j])
-
 
     def accurateCalculateInverseKinematics(self, targetPos, targetOrn, threshold, maxIter):
         closeEnough = False
@@ -60,4 +79,3 @@ class roboticMoving():
     def gripperPush(self):
         pb.setJointMotorControl2(self.robotId, self.gripper[0], pb.POSITION_CONTROL,1)
         pb.setJointMotorControl2(self.robotId, self.gripper[1], pb.POSITION_CONTROL,1)
-    

@@ -10,14 +10,19 @@ class Args():
         self.useRealTimeSimulation = 0
         self.control_dt = 1./240.
 
+        # image param
+        self.rgbdPath = "./data/"
+        self.cameraImgWidth = 640
+        self.cameraImgHight = 480
         # camera param
-        self.cameraPos = [0.65, 0., 1.]
-        self.cameraFocus = [0.55, 0., 0.2]
+        self.cameraPos = [0.51, -0.6, 0.8]
+        self.cameraFocus = [0.5, 0., 0.3]
         self.cameraVector = [0., 0., 1.]
-        self.cameraFov = 50.
-        self.cameraAspect = 1.0
-        self.cameraNearVal = 0.01
+        self.cameraFov = 90.
+        self.cameraAspect = self.cameraImgWidth / self.cameraImgHight
+        self.cameraNearVal = 0.1
         self.cameraFarVal = 20
+
 
         # robot param
         # self.robotType = "SDF"  # SDF or URDF
@@ -27,7 +32,7 @@ class Args():
         self.robotEndEffectorIndex = 6
         self.robotGrippers = [9, 10]
         self.robotScale = 1
-        self.robotInitAngle = [-math.pi/6., math.pi/4.-0.3, 0.0, -math.pi/2. + 0.3, 0.0, 3*math.pi/4., -math.pi/4., -math.pi/2., -math.pi/2., 1, 1, 0]
+        self.robotInitAngle = [math.pi/9, math.pi/4.-0.3, 0.0, -math.pi/2. + 0.3, 0.0, 3*math.pi/4., -math.pi/4., -math.pi/2., -math.pi/2., 1, 1, 0]
         
 
         # other UDRF param
