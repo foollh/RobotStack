@@ -12,17 +12,24 @@ class robotEnvironment():
             pb.connect(pb.GUI)
 
         # set openGL camera param
-        self.viewMatrix = pb.computeViewMatrix(args.cameraPos, args.cameraFocus, args.cameraVector)
-        self.projectionMatrix = pb.computeProjectionMatrixFOV(args.cameraFov, args.cameraAspect, args.cameraNearVal, args.cameraFarVal)
-        
-        # get camera intrinsics matrix from camera settings
+        self.viewList = pb.computeViewMatrix(args.cameraPos, args.cameraFocus, args.cameraVector)
+        self.viewMatrix = np.asarray(self.viewList).reshape([4,4],order='F')
+        self.projectionList = pb.computeProjectionMatrixFOV(args.cameraFov, args.cameraAspect, args.cameraNearVal, args.cameraFarVal)
+        self.projectionMatrix = np.asarray(self.projectionList).reshape([4,4],order='F')
+
+        # get camera intrinsics and extrinsics matrix from camera settings
         self.intrinsicsMatrix = np.eye(3)
-        self.intrinsicsMatrix[0, 0] = args.cameraImgWidth * self.projectionMatrix[0] / 2
-        self.intrinsicsMatrix[1, 1] = args.cameraImgHight * self.projectionMatrix[5] / 2
-        self.intrinsicsMatrix[0, 2] = args.cameraImgWidth * (1 - self.projectionMatrix[8]) / 2
-        self.intrinsicsMatrix[1, 2] = args.cameraImgHight * (1 + self.projectionMatrix[9]) / 2
-        
+        self.intrinsicsMatrix[0, 0] = args.cameraImgWidth * self.projectionList[0] / 2
+        self.intrinsicsMatrix[1, 1] = args.cameraImgHight * self.projectionList[5] / 2
+        self.intrinsicsMatrix[0, 2] = args.cameraImgWidth * (1 - self.projectionList[8]) / 2
+        self.intrinsicsMatrix[1, 2] = args.cameraImgHight * (1 + self.projectionList[9]) / 2
         self.distCoeffs = np.mat([0,0,0,0,0])
+
+        flip_axis = np.array([[1., 0, 0, 0], 
+                        [0, -1., 0, 0], 
+                        [0, 0, -1., 0],
+                        [0, 0, 0, 1.]])
+        self.extrinsicMatrix = self.viewMatrix @ flip_axis
 
     def basic_env(self, args):
         pb.setGravity(0, 0, args.gravity)
@@ -31,13 +38,13 @@ class robotEnvironment():
         # load urdf models
         pb.loadURDF("plane.urdf", [0, 0, -0.3])
         pb.loadURDF(args.tablePath, basePosition=args.tablePosition)
-        # pb.loadURDF(args.trayPath, basePosition=args.trayPosition)
+        pb.loadURDF(args.trayPath, basePosition=args.trayPosition)
 
     def cameraTakePhoto(self, args, i, j):
         width, height, rgbImg, depthImg, segImg = pb.getCameraImage(
                     width=args.cameraImgWidth, height=args.cameraImgHight,
-                    viewMatrix=self.viewMatrix,
-                    projectionMatrix=self.projectionMatrix,
+                    viewMatrix=self.viewList,
+                    projectionMatrix=self.projectionList,
                     renderer = pb.ER_TINY_RENDERER)
         cv2.imwrite(args.rgbdPath + "frame_rgb" + str(i) + str(j) + ".png", rgbImg)
         cv2.imwrite(args.rgbdPath + "frame_depth" + str(i) + str(j) + ".tiff", depthImg)
