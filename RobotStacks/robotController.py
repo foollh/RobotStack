@@ -33,7 +33,7 @@ class roboticMoving():
         pb.addUserDebugLine(pre_pos2, tar_pos2,lineColorRGB=color, lineWidth=300)
         pb.addUserDebugLine(pre_pos3, tar_pos3,lineColorRGB=color, lineWidth=300)
         pb.addUserDebugText(str(idx), pre_pos1, textColorRGB=[1, 0, 0], textSize=2.)
-        print("link{0} position:\n{1}".format(idx, posIndex))
+        # print("link{0} position:\n{1}".format(idx, posIndex))
     
     def getpos(self, linkIndex):
         linkInfo = pb.getLinkState(self.robotId, linkIndex)

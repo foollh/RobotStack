@@ -69,9 +69,9 @@ def transPixelToWorldCoordinate(img_width, img_height, keypoints, depthImg, proj
     keypointsWorldPos = []
     tran_pix_world = np.linalg.inv(np.matmul(projectionMatrix, viewMatrix))
     for point in keypoints:
-        x = (2 * point[0] - img_width)/img_width
-        y = -(2 * point[1] - img_height)/img_height  # be careful！ deepth and its corresponding position
-        z = 2 * depthImg[point[1], point[0]] - 1
+        x = (2 * int(point[0]) - img_width)/img_width
+        y = -(2 * int(point[1]) - img_height)/img_height  # be careful！ deepth and its corresponding position
+        z = 2 * depthImg[int(point[1]), int(point[0])] - 1
         pixPos = np.asarray([x, y, z, 1])
         position = np.matmul(tran_pix_world, pixPos)
         pointWorldPos = (position / position[3])[:3]

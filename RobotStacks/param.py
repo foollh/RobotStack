@@ -32,7 +32,7 @@ class Args():
         self.robotEndEffectorIndex = 6
         self.robotGrippers = [9, 10]
         self.robotScale = 1
-        self.robotInitAngle = [math.pi/6, math.pi/4.-0.3, 0.0, -math.pi/2. + 0.3, 0.0, 3*math.pi/4., -math.pi/4., -math.pi/2., -math.pi/2., 1, 1, 0]
+        self.robotInitAngle = [0., math.pi/4.-0.3, 0.0, -math.pi/2. + 0.3, 0.0, 3*math.pi/4., -math.pi/4., -math.pi/2., -math.pi/2., 1, 1, 0]
         
 
         # other UDRF param

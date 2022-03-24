@@ -26,10 +26,14 @@ class robotEnvironment():
         self.distCoeffs = np.mat([0,0,0,0,0])
 
         flip_axis = np.array([[1., 0, 0, 0], 
-                        [0, -1., 0, 0], 
-                        [0, 0, -1., 0],
-                        [0, 0, 0, 1.]])
-        self.extrinsicMatrix = self.viewMatrix @ flip_axis
+                            [0, -1., 0, 0], 
+                            [0, 0, -1., 0],
+                            [0, 0, 0, 1]])
+        # self.extrinsicMatrix = self.viewMatrix.copy()
+        self.extrinsicMatrix = flip_axis @ self.viewMatrix
+
+        # self.extrinsicMatrix = np.linalg.inv(self.viewMatrix)
+        # self.extrinsicMatrix[:, 1:3] = - self.extrinsicMatrix[:, 1:3]
 
     def basic_env(self, args):
         pb.setGravity(0, 0, args.gravity)
@@ -38,7 +42,7 @@ class robotEnvironment():
         # load urdf models
         pb.loadURDF("plane.urdf", [0, 0, -0.3])
         pb.loadURDF(args.tablePath, basePosition=args.tablePosition)
-        pb.loadURDF(args.trayPath, basePosition=args.trayPosition)
+        # pb.loadURDF(args.trayPath, basePosition=args.trayPosition)
 
     def cameraTakePhoto(self, args, i, j):
         width, height, rgbImg, depthImg, segImg = pb.getCameraImage(
@@ -74,9 +78,9 @@ class robotEnvironment():
           for j in range(layerNum):
             for k in range(layerNum):
                 #随即方块的位置
-                xpos = args.trayPosition[0] + 5*args.cubeRadius*(i - int(layerNum/2) + random.random() - 0.5)
-                ypos = args.trayPosition[1] + 5*args.cubeRadius*(j - int(layerNum/2) + random.random() - 0.5)
-                zpos = args.trayPosition[2] + 5*args.cubeRadius*(k+1+random.random())
+                xpos = args.trayPosition[0] + 10*args.cubeRadius*(i - int(layerNum/2) + random.random() - 0.5)
+                ypos = args.trayPosition[1] + 10*args.cubeRadius*(j - int(layerNum/2) + random.random() - 0.5)
+                zpos = args.trayPosition[2] + 3*args.cubeRadius*(k+1+random.random())
                 ang = 3.14 * 0.5 + 3.1415925438 * random.random()
                 baseOrientation = pb.getQuaternionFromEuler([0, 0, ang])
                 basePosition = [xpos, ypos, zpos]

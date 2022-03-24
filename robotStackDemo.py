@@ -3,11 +3,24 @@ import math
 import numpy as np
 import cv2
 import pybullet as pb
-from RobotStacks import Args, robotEnvironment, roboticMoving
+from RobotStacks import Args, robotEnvironment, roboticMoving, transDepthBufferToRealZ
 
 
 if __name__ == "__main__":
     args = Args()
+
+    # camera param
+    args.cameraPos = [0.6, 0., 0.6]
+    args.cameraFocus = [0.6, 0., 0.]
+    args.cameraVector = [1., 0., 0.]
+    args.cameraFov = 90
+    args.cameraAspect = 640/480
+    args.cameraNearVal = 0.1
+    args.cameraFarVal = 20
+
+    args.robotInitAngle = [math.pi/3, math.pi/4.-0.3, 0.0, -math.pi/2. + 0.3, 0.0, 3*math.pi/4., -math.pi/4., -math.pi/2., -math.pi/2., 1, 1, 0]
+        
+
     env = robotEnvironment(args)
     env.basic_env(args)
 
@@ -16,7 +29,7 @@ if __name__ == "__main__":
     rm = roboticMoving(args)
 
     # start stack
-    state_durations=[0.2, 0.2, 0.2, 0.2, 0.3, 0.3, 0.3] # the simulate time in every motion
+    state_durations=[0.5, 0.2, 0.2, 0.2, 0.3, 0.3, 0.3] # the simulate time in every motion
     pb.setTimeStep=args.control_dt
     colnum = int(math.sqrt(args.cubeNum))
     for i in range(colnum):
@@ -29,8 +42,8 @@ if __name__ == "__main__":
                 
                 width, height, rgbImg, depthImg, segImg = pb.getCameraImage(
                         width=320, height=240,
-                        viewMatrix=env.viewMatrix,
-                        projectionMatrix=env.projectionMatrix)
+                        viewMatrix=env.viewList,
+                        projectionMatrix=env.projectionList)
 
                 xpos = args.cubeBasePosition[0]
                 ypos = args.cubeBasePosition[1]
@@ -59,6 +72,18 @@ if __name__ == "__main__":
                 if state_t>state_durations[current_state]:
                     if current_state == 0:
                         pass
+                        width, height, rgbImg, depthImg, segImg = pb.getCameraImage(
+                        width=args.cameraImgWidth, height=args.cameraImgHight,
+                        viewMatrix=env.viewList,
+                        projectionMatrix=env.projectionList)
+                        # lightDirection=[0, 0, 1],
+                        # lightColor=[1, 1, 1],
+                        # lightDistance=1.,
+                        # renderer = pb.ER_BULLET_HARDWARE_OPENGL)
+                        depthImgReal = transDepthBufferToRealZ(width, height, depthImg, env.projectionMatrix)
+
+                        # cv2.imwrite("img/framecalibrateRGB.png", rgbImg) 
+                        # cv2.imwrite("img/framecalibrateDepth.exr", depthImgReal)
                         # env.cameraTakePhoto(args, i, j)
                     current_state+=1
                     if current_state>=len(state_durations):

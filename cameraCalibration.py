@@ -84,7 +84,7 @@ def main():
     args = Args()
 
     # camera param  0.8: 0.8753687  0.6: 0.8302822  0.5:0.7935055
-    args.cameraPos = [0.65, 0., 0.8]
+    args.cameraPos = [0.65, -0.1, 0.8]
     args.cameraFocus = [0.65, 0., 0.]
     args.cameraVector = [1., 0., 0.]
     args.cameraFov = 90
@@ -152,16 +152,21 @@ def main():
         pb.stepSimulation()
     
     imagePoints = calibrateCubes()
-    print("imageKeypoints:\n", imagePoints)
+    # print("imageKeypoints:\n", imagePoints)
     imagePointsDepth = getKeypointsDepth(imagePoints)
-    print("imageKeypointsDepth:\n", imagePointsDepth)
+    # print("imageKeypointsDepth:\n", imagePointsDepth)
 
     _, R, T = cv2.solvePnP(cubeCenterPos, imagePoints, env.intrinsicsMatrix, env.distCoeffs)
 
     RT = np.eye(4)
     RT[:3, :3] = cv2.Rodrigues(R)[0]
-    RT[:3, -1] = T.reshape(3)
+    RT[:3, -1] = T.reshape(3)   
     print("RT transform:\n", RT)
+    print("RT inv transform:\n", np.linalg.inv(RT))
+    print("view Matrix:\n", env.viewMatrix)
+    print("inv view matrix:\n", np.linalg.inv(env.viewMatrix))
+    print("extrinsics matrix:\n", env.extrinsicMatrix)  
+    print("inv extrinsics matrix:\n", np.linalg.inv(env.extrinsicMatrix))  
 
     homoPoint = np.ones(3)
     cameraPoint = np.ones([4, 1])
