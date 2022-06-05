@@ -42,7 +42,7 @@ class robotEnvironment():
         # load urdf models
         pb.loadURDF("plane.urdf", [0, 0, -0.3])
         pb.loadURDF(args.tablePath, basePosition=args.tablePosition)
-        # pb.loadURDF(args.trayPath, basePosition=args.trayPosition)
+        pb.loadURDF(args.trayPath, basePosition=args.trayPosition)
 
     def cameraTakePhoto(self, args, i, j):
         width, height, rgbImg, depthImg, segImg = pb.getCameraImage(
@@ -54,6 +54,12 @@ class robotEnvironment():
         cv2.imwrite(args.rgbdPath + "frame_depth" + str(i) + str(j) + ".tiff", depthImg)
         # cv2.imwrite(rgbdPath + "frame_seg" + str(i) + str(j) + ".png", segImg)
 
+
+    def singleCube(self, cube_size, pos):
+        cubeUid = pb.createCollisionShape(pb.GEOM_BOX, halfExtents=[cube_size, cube_size, cube_size])
+        pb.createMultiBody(0.1, cubeUid, -1, pos, pb.getQuaternionFromEuler([0, 0, 0]))
+        return cubeUid
+        
     def regularCubes(self, args):
         cubeCenterPos = []
         cubeUid = pb.createCollisionShape(pb.GEOM_BOX, halfExtents=[args.cubeRadius, args.cubeRadius, args.cubeRadius])

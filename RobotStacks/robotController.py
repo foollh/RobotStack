@@ -1,6 +1,6 @@
 import sys
 import math
-from tkinter.messagebox import NO
+import random
 import pybullet as pb
 
 class roboticMoving():
@@ -52,7 +52,8 @@ class roboticMoving():
             pb.setJointMotorControl2(bodyIndex=self.robotId,
                                 jointIndex=j,
                                 controlMode=pb.POSITION_CONTROL,
-                                targetPosition=jointPoses[j])
+                                targetPosition=jointPoses[j],
+                                maxVelocity=5.)
 
     def accurateCalculateInverseKinematics(self, targetPos, targetOrn, threshold, maxIter):
         closeEnough = False

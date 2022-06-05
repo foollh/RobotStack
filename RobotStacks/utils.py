@@ -4,9 +4,9 @@ def getCameraPoseFromViewMatrix(viewMatrix):
     '''
     Args:
     inputs:
-    viewMatrix -> numpy.array(4, 4)
+        viewMatrix -> numpy.array(4, 4)
     output:
-    transform -> numpy.array(4, 4), represent: camera_axis = transform @ world_axis
+        transform -> numpy.array(4, 4), represent: camera_axis = transform @ world_axis
     '''
     # get camera pose from the view matrix
     # view_mat4x4 = np.array(viewMatrix).reshape(4, 4)
@@ -34,12 +34,12 @@ def transDepthBufferToRealZ(img_width, img_height, depthImg, projectionMatrix):
     '''
     Args:
     inputs:
-    img_width -> the width of image from pybullet.getcameraImg() API
-    img_height -> the height of image from pybullet.getCameraImg() API
-    depthImg -> the depth image from pybullet.getCameraImg() API
-    projectionMatrix -> numpy.array(4, 4)
+        img_width -> the width of image from pybullet.getcameraImg() API
+        img_height -> the height of image from pybullet.getCameraImg() API
+        depthImg -> the depth image from pybullet.getCameraImg() API
+        projectionMatrix -> numpy.array(4, 4)
     outputs:
-    realDepthImg -> the real depth of rgba image 
+        realDepthImg -> the real depth of rgba image 
     '''
     realDepthImg = depthImg.copy()
 
@@ -57,14 +57,14 @@ def transPixelToWorldCoordinate(img_width, img_height, keypoints, depthImg, proj
     '''
     Args:
     inputs:
-    img_width -> the width of image from pybullet.getcameraImg() API
-    img_height -> the height of image from pybullet.getCameraImg() API
-    keypoints -> the keypoints in images, usually detected by opencv, so be careful about the xy coordinate.
-    depthImg -> the depth image from pybullet.getCameraImg() API
-    projectionMatrix -> numpy.array(4, 4)
-    viewMatrix -> numpy.array(4, 4)
+        img_width -> the width of image from pybullet.getcameraImg() API
+        img_height -> the height of image from pybullet.getCameraImg() API
+        keypoints -> the keypoints in images, usually detected by opencv, so be careful about the xy coordinate.
+        depthImg -> the depth image from pybullet.getCameraImg() API
+        projectionMatrix -> numpy.array(4, 4)
+        viewMatrix -> numpy.array(4, 4)
     outputs:
-
+        keypointsWorldPos -> the keypoints in world coordinate
     '''
     keypointsWorldPos = []
     tran_pix_world = np.linalg.inv(np.matmul(projectionMatrix, viewMatrix))
@@ -77,3 +77,23 @@ def transPixelToWorldCoordinate(img_width, img_height, keypoints, depthImg, proj
         pointWorldPos = (position / position[3])[:3]
         keypointsWorldPos.append(pointWorldPos)
     return np.array(keypointsWorldPos)
+
+
+def transWorldToPixelCoordinate(worldPoints, intrinsicMatrix, extrinsicMatrix):
+    homoIntrinsicMatrix = np.zeros([3, 4])
+    homoIntrinsicMatrix[:3, :3] = intrinsicMatrix
+
+    tran_world_pix = np.matmul(homoIntrinsicMatrix, extrinsicMatrix)
+    keypointsImagePos = []
+    for wp in worldPoints:
+        keypointPos = np.zeros(2)
+        homoPos = np.asarray([[wp[0]], [wp[1]], [wp[2]], [1]])
+        pixPos = np.matmul(tran_world_pix, homoPos)
+        pixPos = pixPos / pixPos[-1]
+        keypointPos[0], keypointPos[1] = pixPos[0], pixPos[1]
+
+        # keypointPos[0] = (pixPos[0]*img_width + img_width)/2
+        # keypointPos[1] = (pixPos[0]*img_height + img_height)/2
+        keypointsImagePos.append(keypointPos)
+    
+    return keypointsImagePos

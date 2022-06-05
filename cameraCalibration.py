@@ -3,7 +3,7 @@ import numpy as np
 import time
 import math
 import pybullet as pb
-from RobotStacks import Args, robotEnvironment, roboticMoving, transDepthBufferToRealZ
+from RobotStacks import Args, robotEnvironment, transDepthBufferToRealZ, transPixelToWorldCoordinate
 
 def ShapeDetection(img, imgContour):
     keyPoints = []
@@ -84,7 +84,7 @@ def main():
     args = Args()
 
     # camera param  0.8: 0.8753687  0.6: 0.8302822  0.5:0.7935055
-    args.cameraPos = [0.65, -0.1, 0.8]
+    args.cameraPos = [0.65, -0., 0.8]
     args.cameraFocus = [0.65, 0., 0.]
     args.cameraVector = [1., 0., 0.]
     args.cameraFov = 90
@@ -157,15 +157,15 @@ def main():
     # print("imageKeypointsDepth:\n", imagePointsDepth)
 
     _, R, T = cv2.solvePnP(cubeCenterPos, imagePoints, env.intrinsicsMatrix, env.distCoeffs)
-
+    # R represent the point transform world coordinate to camera coordinate 
     RT = np.eye(4)
     RT[:3, :3] = cv2.Rodrigues(R)[0]
     RT[:3, -1] = T.reshape(3)   
     print("RT transform:\n", RT)
     print("RT inv transform:\n", np.linalg.inv(RT))
-    print("view Matrix:\n", env.viewMatrix)
-    print("inv view matrix:\n", np.linalg.inv(env.viewMatrix))
-    print("extrinsics matrix:\n", env.extrinsicMatrix)  
+    # print("view Matrix:\n", env.viewMatrix)
+    # print("inv view matrix:\n", np.linalg.inv(env.viewMatrix))
+    # print("extrinsics matrix:\n", env.extrinsicMatrix)  
     print("inv extrinsics matrix:\n", np.linalg.inv(env.extrinsicMatrix))  
 
     homoPoint = np.ones(3)
